@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 
 import javax.sql.DataSource;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +59,6 @@ public class SpringBatchConfig {
 
         Map<String, Order> orderById = new HashMap<>();
         orderById.put("id", Order.ASCENDING);
-//        mySqlPagingQueryProvider.setSortKeys(orderByName);
         postgresPagingQueryProvider.setSortKeys(orderById);
         pagingItemReader.setQueryProvider(postgresPagingQueryProvider);
 
@@ -68,7 +68,7 @@ public class SpringBatchConfig {
     @Bean
     public FlatFileItemWriter<Loan> writer() {
         FlatFileItemWriter<Loan> writer = new FlatFileItemWriter<>();
-        writer.setResource(new FileSystemResource("C://Users/ishu.thakur/Desktop/data.csv"));
+        writer.setResource(new FileSystemResource("C://Users/ishu.thakur/Desktop/JdbcPagingItemReader-spring-batch-example/src/main/resources/data.csv"));
         writer.setLineAggregator(getDelimitedLineAggregator());
         return writer;
     }
@@ -86,14 +86,14 @@ public class SpringBatchConfig {
 
     @Bean
     public Step getDbToCsvStep() {
-        StepBuilder stepBuilder = stepBuilderFactory.get("getDbToCsvStep");
+        StepBuilder stepBuilder = stepBuilderFactory.get("getDbToCsvStep" + Instant.now());
         SimpleStepBuilder<Loan, Loan> simpleStepBuilder = stepBuilder.chunk(1);
         return simpleStepBuilder.reader(jdbcPagingItemReader()).processor(processor()).writer(writer()).build();
     }
 
     @Bean
     public Job dbToCsvJob() {
-        JobBuilder jobBuilder = jobBuilderFactory.get("dbToCsvJob");
+        JobBuilder jobBuilder = jobBuilderFactory.get("dbToCsvJob" + Instant.now());
         jobBuilder.incrementer(new RunIdIncrementer());
         FlowJobBuilder flowJobBuilder = jobBuilder.flow(getDbToCsvStep()).end();
         Job job = flowJobBuilder.build();

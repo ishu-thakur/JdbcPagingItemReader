@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/batchloandb
+    username: postgres
+    password: ishu
+  liquibase:
+    change-log: classpath:db.changelog/db.changelog-master.xml
+    user: postgres
+    password: ishu
+    enabled: true
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+  batch:
+    initialize-schema: always
+    #  disabled job run at startup because i want to tigger it from my controller
+#    job:
+#      enabled: true
